@@ -7,3 +7,4 @@ Startup
 .project
 ADC_LCD Debug.launch
 *.ld
+ADC_LCD Flash.launch

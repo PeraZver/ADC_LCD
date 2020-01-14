@@ -14,4 +14,11 @@ This is an educational project, so the purpose is only fun and learning.
 
 ## To-Do
 
- [ ] 
+ [ ] Display multichannel ADC measurement values
+ [ ] Make some cool professional font
+ [ ] Multiple measurements using DMA
+ [ ] Add touchscreen functionality
+ [ ] Calculate some statistics on touchscreen touch
+ [ ] FreeRTOS?
+
+ 

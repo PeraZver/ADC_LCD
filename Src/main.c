@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
@@ -55,6 +56,8 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+char err_msg[30]; // Store error messages and warnings
+HAL_StatusTypeDef check; // variable for return status of variois functions
 
 /* USER CODE END PV */
 
@@ -97,15 +100,28 @@ int main(void)
 
   /* USER CODE END SysInit */
 
-  /* Initialise all configured peripherals */
+  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_TIM1_Init();
   MX_USART2_UART_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+  //initial driver setup to drive ili9341
+  ILI9341_Init();
+  ILI9341_Fill_Screen(WHITE);
+  ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
 	
-	ILI9341_Init();//initial driver setup to drive ili9341
-	
+  //Startup the ADC
+	sprintf(err_msg, "ADC State: 0x%X\n\r", HAL_ADC_GetState(&hadc1));
+	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
+	if ( HAL_ADC_Start(&hadc1) == HAL_OK )
+		sprintf(err_msg, "ADC Started.");
+	else
+		sprintf(err_msg, "ADC couldn't start.");
+	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
+	sprintf(err_msg, "ADC State: 0x%X\n\r", HAL_ADC_GetState(&hadc1));
+	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
 	
   /* USER CODE END 2 */
 
@@ -116,76 +132,45 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		
-//----------------------------------------------------------PERFORMANCE TEST
-		ILI9341_Fill_Screen(WHITE);
-		ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
-		ILI9341_Draw_Text("FPS TEST, 40 loop 2 screens", 10, 10, BLACK, 1, WHITE);
-		HAL_Delay(2000);
-		ILI9341_Fill_Screen(WHITE);
-		
-		uint32_t Timer_Counter = 0;
-		for(uint32_t j = 0; j < 2; j++)
-		{
-			HAL_TIM_Base_Start(&htim1);
-			for(uint16_t i = 0; i < 10; i++)
-			{
-				ILI9341_Fill_Screen(WHITE);
-				ILI9341_Fill_Screen(BLACK);
-			}
-			
-			//20.000 per second!
-			HAL_TIM_Base_Stop(&htim1);		
-			Timer_Counter += __HAL_TIM_GET_COUNTER(&htim1);
-			__HAL_TIM_SET_COUNTER(&htim1, 0);
-		}
-		Timer_Counter /= 2;
-		
-		char counter_buff[30];		
-		ILI9341_Fill_Screen(WHITE);
-		ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
 
-		sprintf(counter_buff, "Timer counter value: %lu\n", Timer_Counter*2);
-		HAL_UART_Transmit(&huart2, (uint8_t*) counter_buff, strlen(counter_buff), 0xFFFF);
-		ILI9341_Draw_Text(counter_buff, 10, 10, BLACK, 1, WHITE);
-		
-		double seconds_passed = 2*((float)Timer_Counter * 200 / 1000000); // <- Total prescaler is 2*10000
-		sprintf(counter_buff, "Time: %.3f Sec\n", seconds_passed);
-		HAL_UART_Transmit(&huart2, (uint8_t*) counter_buff, strlen(counter_buff), 0xFFFF);
-		ILI9341_Draw_Text(counter_buff, 10, 30, BLACK, 2, WHITE);
-		
-		double timer_float = 20/(((float)Timer_Counter)* 200 / 1000000);	//Frames per sec
-		sprintf(counter_buff, "FPS:  %.2f\n", timer_float);
-		HAL_UART_Transmit(&huart2, (uint8_t*) counter_buff, strlen(counter_buff), 0xFFFF);
-		ILI9341_Draw_Text(counter_buff, 10, 50, BLACK, 2, WHITE);
+	if ( HAL_ADC_PollForConversion(&hadc1, 5000) == HAL_OK) {
+		uint32_t adc = HAL_ADC_GetValue(&hadc1);
 
-		double MB_PS = timer_float*240*320*2/1000000;
-		sprintf(counter_buff, "MB/S: %.2f\n", MB_PS);
-		HAL_UART_Transmit(&huart2, (uint8_t*) counter_buff, strlen(counter_buff), 0xFFFF);
-		ILI9341_Draw_Text(counter_buff, 10, 70, BLACK, 2, WHITE);
+		char display_string[30] = {'0'};
+		sprintf(display_string, "ADC Value: %lu", adc);
+		HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+		ILI9341_Draw_Text(display_string, 10, 10, BLACK, 2, WHITE);
 
-		double SPI_utilized_percentage = (MB_PS/(6.25 ))*100;		//50mbits / 8 bits
-		sprintf(counter_buff, "SPI Utilized: %.2f\n", SPI_utilized_percentage);
-		HAL_UART_Transmit(&huart2, (uint8_t*) counter_buff, strlen(counter_buff), 0xFFFF);
-		ILI9341_Draw_Text(counter_buff, 10, 90, BLACK, 2, WHITE);
-		HAL_Delay(10000);
-		
-		char Temp_Buffer_text[40];
-		
-//----------------------------------------------------------COUNTING SINGLE SEGMENT		
-		ILI9341_Fill_Screen(WHITE);
-		ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
-		ILI9341_Draw_Text("Counting single segment", 10, 10, BLACK, 1, WHITE);
-		HAL_Delay(2000);
-		ILI9341_Fill_Screen(WHITE);
-	
-		for(uint16_t i = 0; i <= 100; i++)
-		{
-		sprintf(Temp_Buffer_text, "Counting: %d", i);
-		ILI9341_Draw_Text(Temp_Buffer_text, 10, 10, BLACK, 3, WHITE);			
-		}
-		
-		HAL_Delay(1000);
+		float voltage = (float)adc * 3.3/4096;
+		sprintf(display_string, "Voltage: %.2f V", voltage);
+		HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+		ILI9341_Draw_Text(display_string, 10, 30, BLACK, 2, WHITE);
+
+		/* Temp. sensor characteristics from the STM32F4 datasheet:
+		 *  Slope: 2.5mV/°C
+		 *  Voltage at 25°C = 0.76
+		 *  What means that: V = 760 mV + 2.5*(T - 25°C) = 697.5 mV + 2.5*T
+		 *  Back calculating: T = (V - 697.5)/2.5
+		 */
+		float temperature = (voltage*1000 - 697.5) / 2.5;
+		sprintf(display_string, "Temperature: %.2f", temperature);
+		HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+		ILI9341_Draw_Text(display_string, 10, 50, BLACK, 2, WHITE);
+
+		sprintf(err_msg, "ADC State: 0x%X\n", HAL_ADC_GetState(&hadc1));
+		HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
+
+		HAL_ADC_Stop(&hadc1);
+		sprintf(err_msg, "ADC State: 0x%X\n", HAL_ADC_GetState(&hadc1));
+		HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
+
+		if ( HAL_ADC_Start(&hadc1) == HAL_OK )
+			sprintf(err_msg, "ADC Started.");
+		else
+			sprintf(err_msg, "ADC couldn't start.");
+		HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
+	}
+
 
   }
   /* USER CODE END 3 */
@@ -212,7 +197,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
   RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 50;
+  RCC_OscInitStruct.PLL.PLLN = 100;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
@@ -225,10 +210,10 @@ void SystemClock_Config(void)
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
   {
     Error_Handler();
   }
