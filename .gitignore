@@ -1,0 +1,9 @@
+Debug
+Drivers
+Startup
+.settings
+.cproject
+.mxproject
+.project
+ADC_LCD Debug.launch
+*.ld
