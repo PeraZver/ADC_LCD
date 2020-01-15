@@ -56,7 +56,7 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-
+extern ADC_HandleTypeDef hadc1;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -196,6 +196,56 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles ADC1 global interrupt.
+  */
+void ADC_IRQHandler(void)
+{
+  /* USER CODE BEGIN ADC_IRQn 0 */
+
+  /* USER CODE END ADC_IRQn 0 */
+  HAL_ADC_IRQHandler(&hadc1);
+  /* USER CODE BEGIN ADC_IRQn 1 */
+
+		uint32_t adc = HAL_ADC_GetValue(&hadc1);
+
+		char display_string[30] = {'0'};
+		sprintf(display_string, "ADC Value: %lu", adc);
+		HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+		ILI9341_Draw_Text(display_string, 10, 10, BLACK, 2, WHITE);
+
+		float voltage = (float)adc * 3.3f/4096.0f;
+		sprintf(display_string, "Voltage: %.2f V", voltage);
+		HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+		ILI9341_Draw_Text(display_string, 10, 30, BLACK, 2, WHITE);
+
+		/* Temp. sensor characteristics from the STM32F4 datasheet:
+		 *  Slope: 2.5mV/°C
+		 *  Voltage at 25°C = 0.76
+		 *  What means that: V = 760 mV + 2.5*(T - 25°C) = 697.5 mV + 2.5*T
+		 *  Back calculating: T = (V - 697.5)/2.5
+		 */
+		float temperature = (voltage*1000 - 697.5) / 2.5;
+		sprintf(display_string, "Temperature: %.2f", temperature);
+		HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+		ILI9341_Draw_Text(display_string, 10, 50, BLACK, 2, WHITE);
+
+		sprintf(err_msg, "ADC State: 0x%X\n", HAL_ADC_GetState(&hadc1));
+		HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
+
+		HAL_ADC_Stop_IT(&hadc1);
+		sprintf(err_msg, "ADC State: 0x%X\n", HAL_ADC_GetState(&hadc1));
+		HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
+
+		if ( HAL_ADC_Start_IT(&hadc1) == HAL_OK )
+			sprintf(err_msg, "ADC Started.");
+		else
+			sprintf(err_msg, "ADC couldn't start.");
+		HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
+
+  /* USER CODE END ADC_IRQn 1 */
+}
 
 /* USER CODE BEGIN 1 */
 

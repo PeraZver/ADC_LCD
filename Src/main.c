@@ -28,10 +28,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <string.h>
-#include <stdio.h>
 //#include "ILI9341_Touchscreen.h"
-
 #include "ILI9341_STM32_Driver.h"
 #include "ILI9341_GFX.h"
 
@@ -56,7 +53,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-char err_msg[30]; // Store error messages and warnings
+char err_msg[40];
 HAL_StatusTypeDef check; // variable for return status of variois functions
 
 /* USER CODE END PV */
@@ -115,10 +112,11 @@ int main(void)
   //Startup the ADC
 	sprintf(err_msg, "ADC State: 0x%X\n\r", HAL_ADC_GetState(&hadc1));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
-	if ( HAL_ADC_Start(&hadc1) == HAL_OK )
-		sprintf(err_msg, "ADC Started.");
+
+	if ( HAL_ADC_Start_IT(&hadc1) == HAL_OK )
+		sprintf(err_msg, "ADC Started in Interruot mode\n.");
 	else
-		sprintf(err_msg, "ADC couldn't start.");
+		sprintf(err_msg, "ADC couldn't start.\n");
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
 	sprintf(err_msg, "ADC State: 0x%X\n\r", HAL_ADC_GetState(&hadc1));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
@@ -132,45 +130,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-	if ( HAL_ADC_PollForConversion(&hadc1, 5000) == HAL_OK) {
-		uint32_t adc = HAL_ADC_GetValue(&hadc1);
-
-		char display_string[30] = {'0'};
-		sprintf(display_string, "ADC Value: %lu", adc);
-		HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-		ILI9341_Draw_Text(display_string, 10, 10, BLACK, 2, WHITE);
-
-		float voltage = (float)adc * 3.3/4096;
-		sprintf(display_string, "Voltage: %.2f V", voltage);
-		HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-		ILI9341_Draw_Text(display_string, 10, 30, BLACK, 2, WHITE);
-
-		/* Temp. sensor characteristics from the STM32F4 datasheet:
-		 *  Slope: 2.5mV/°C
-		 *  Voltage at 25°C = 0.76
-		 *  What means that: V = 760 mV + 2.5*(T - 25°C) = 697.5 mV + 2.5*T
-		 *  Back calculating: T = (V - 697.5)/2.5
-		 */
-		float temperature = (voltage*1000 - 697.5) / 2.5;
-		sprintf(display_string, "Temperature: %.2f", temperature);
-		HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-		ILI9341_Draw_Text(display_string, 10, 50, BLACK, 2, WHITE);
-
-		sprintf(err_msg, "ADC State: 0x%X\n", HAL_ADC_GetState(&hadc1));
-		HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
-
-		HAL_ADC_Stop(&hadc1);
-		sprintf(err_msg, "ADC State: 0x%X\n", HAL_ADC_GetState(&hadc1));
-		HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
-
-		if ( HAL_ADC_Start(&hadc1) == HAL_OK )
-			sprintf(err_msg, "ADC Started.");
-		else
-			sprintf(err_msg, "ADC couldn't start.");
-		HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
-	}
-
 
   }
   /* USER CODE END 3 */

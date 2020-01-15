@@ -6,7 +6,7 @@ This is an educational project, so the purpose is only fun and learning.
 
 ## Hardware 
  * A NUCLEO-F411RE board with STM32F411RET6 (100 MHz SYSCLK)
- * A TFT-LCD with ILI9341 driver, with SPI (100 MHz SCK)
+ * A TFT-LCD with ILI9341 driver from [AliExpress](https://www.aliexpress.com/item/32815224002.html?spm=a2g0s.9042311.0.0.6f9d4c4dv0T4OV), with SPI (100 MHz SCK)
 
 ## Software
  * Standard STM32 HAL Libraries, on the fresh STM32CubeIDE
