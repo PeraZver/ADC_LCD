@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -28,9 +28,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include "ILI9341_Touchscreen.h"
-#include "ILI9341_STM32_Driver.h"
-#include "ILI9341_GFX.h"
+#include "ILI9341_Driver.h"
+#include "display.h"
 
 /* USER CODE END Includes */
 
@@ -104,13 +103,17 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  //initial driver setup to drive ili9341
-  ILI9341_Init();
-  ILI9341_Fill_Screen(WHITE);
-  ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2);
+
+	//initial driver setup to drive ili9341
+	ILI9341_Init();
+	ILI9341_Set_Rotation(0);
+	ILI9341_Fill_Screen(BLACK);
+	HAL_Delay(500);
+	ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2); /* Draw border for the menu */
+    ILI9341_Draw_Empty_Rectangle(YELLOW, 10, 10, 310, 230);
 	
-  //Startup the ADC
-	sprintf(err_msg, "ADC State: 0x%X\n\r", HAL_ADC_GetState(&hadc1));
+	//Startup the ADC
+	sprintf(err_msg, "ADC State: 0x%uX\n\r", HAL_ADC_GetState(&hadc1));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
 
 	if ( HAL_ADC_Start_IT(&hadc1) == HAL_OK )
@@ -120,18 +123,18 @@ int main(void)
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
 	sprintf(err_msg, "ADC State: 0x%X\n\r", HAL_ADC_GetState(&hadc1));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
-	
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	while (1)
+	{
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -189,7 +192,7 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
+	/* User can add his own implementation to report the HAL error return state */
 
   /* USER CODE END Error_Handler_Debug */
 }
@@ -205,7 +208,7 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 { 
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
+	/* User can add his own implementation to report the file name and line number,
     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
