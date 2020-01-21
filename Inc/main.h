@@ -34,8 +34,8 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include <string.h>
 #include <stdio.h>
-#include "ILI9341_STM32_Driver.h"
-#include "ILI9341_GFX.h"
+#include "ILI9341_Driver.h"
+#include "display.h"
 #include "usart.h"
 /* USER CODE END Includes */
 
@@ -75,12 +75,12 @@ void Error_Handler(void);
 #define TCK_GPIO_Port GPIOA
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
-#define LCD_RST_Pin GPIO_PIN_5
-#define LCD_RST_GPIO_Port GPIOB
-#define SPI1_CS_Pin GPIO_PIN_6
-#define SPI1_CS_GPIO_Port GPIOB
-#define LCD_DC_Pin GPIO_PIN_7
-#define LCD_DC_GPIO_Port GPIOB
+#define RESET_Pin GPIO_PIN_5
+#define RESET_GPIO_Port GPIOB
+#define CS_Pin GPIO_PIN_6
+#define CS_GPIO_Port GPIOB
+#define DC_Pin GPIO_PIN_7
+#define DC_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
