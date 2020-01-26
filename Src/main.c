@@ -113,15 +113,15 @@ int main(void)
     ILI9341_Draw_Empty_Rectangle(YELLOW, 10, 10, 310, 230);
 	
 	//Startup the ADC
-	sprintf(err_msg, "ADC State: 0x%uX\n\r", HAL_ADC_GetState(&hadc1));
+	sprintf(err_msg, "ADC State: 0x%lX\n\r", HAL_ADC_GetState(&hadc1));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
 
 	if ( HAL_ADC_Start_IT(&hadc1) == HAL_OK )
-		sprintf(err_msg, "ADC Started in Interruot mode\n.");
+		sprintf(err_msg, "ADC Started in Interrupt mode.\r\n.");
 	else
 		sprintf(err_msg, "ADC couldn't start.\n");
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
-	sprintf(err_msg, "ADC State: 0x%X\n\r", HAL_ADC_GetState(&hadc1));
+	sprintf(err_msg, "ADC State: 0x%lX\n\r", HAL_ADC_GetState(&hadc1));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
 
   /* USER CODE END 2 */
