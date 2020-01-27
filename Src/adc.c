@@ -21,10 +21,11 @@
 #include "adc.h"
 
 /* USER CODE BEGIN 0 */
-
+int g_MeasurementNumber = 0;
 /* USER CODE END 0 */
 
 ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
 
 /* ADC1 init function */
 void MX_ADC1_Init(void)
@@ -34,7 +35,7 @@ void MX_ADC1_Init(void)
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV8;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = ENABLE;
@@ -43,7 +44,7 @@ void MX_ADC1_Init(void)
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
-  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
   {
@@ -71,10 +72,29 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
   /* USER CODE END ADC1_MspInit 0 */
     /* ADC1 clock enable */
     __HAL_RCC_ADC1_CLK_ENABLE();
+  
+    /* ADC1 DMA Init */
+    /* ADC1 Init */
+    hdma_adc1.Instance = DMA2_Stream4;
+    hdma_adc1.Init.Channel = DMA_CHANNEL_0;
+    hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_adc1.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_adc1.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_adc1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_adc1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_adc1.Init.Mode = DMA_CIRCULAR;
+    hdma_adc1.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_adc1.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
+    hdma_adc1.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_HALFFULL;
+    hdma_adc1.Init.MemBurst = DMA_MBURST_SINGLE;
+    hdma_adc1.Init.PeriphBurst = DMA_PBURST_SINGLE;
+    if (HAL_DMA_Init(&hdma_adc1) != HAL_OK)
+    {
+      Error_Handler();
+    }
 
-    /* ADC1 interrupt Init */
-    HAL_NVIC_SetPriority(ADC_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(ADC_IRQn);
+    __HAL_LINKDMA(adcHandle,DMA_Handle,hdma_adc1);
+
   /* USER CODE BEGIN ADC1_MspInit 1 */
 
   /* USER CODE END ADC1_MspInit 1 */
@@ -92,8 +112,8 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
     /* Peripheral clock disable */
     __HAL_RCC_ADC1_CLK_DISABLE();
 
-    /* ADC1 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(ADC_IRQn);
+    /* ADC1 DMA DeInit */
+    HAL_DMA_DeInit(adcHandle->DMA_Handle);
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
   /* USER CODE END ADC1_MspDeInit 1 */
@@ -103,7 +123,12 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 /* USER CODE BEGIN 1 */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 
-	uint32_t adc = HAL_ADC_GetValue(hadc);
+	uint32_t g_sum = 0;
+	for (int i = 0; i<ADC_BUFFER_LENGTH; i++)
+		g_sum += g_ADCBuffer[i];
+
+	uint32_t adc = g_sum/ADC_BUFFER_LENGTH;
+	g_MeasurementNumber += ADC_BUFFER_LENGTH;
 
 	char display_string[30] = {'0'};
 	sprintf(display_string, "ADC Value: %lu", adc);
@@ -131,15 +156,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	sprintf(err_msg, "ADC State: 0x%lX\n", HAL_ADC_GetState(hadc));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
 
-	/*HAL_ADC_Stop_IT(hadc);
-	sprintf(err_msg, "ADC State: 0x%lX\n", HAL_ADC_GetState(hadc));
-	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
-
-	if ( HAL_ADC_Start_IT(hadc) == HAL_OK )
-		sprintf(err_msg, "ADC Started in Interrupt mode.\n\r");
-	else
-		sprintf(err_msg, "ADC couldn't start.\n\r.");
-	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);*/
 }
 
 
@@ -148,7 +164,7 @@ void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc){
 	char err_msg[40];
 	sprintf(err_msg, "ADC State: 0x%lX\n", HAL_ADC_GetState(hadc));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
-	HAL_ADC_Start_IT(hadc);
+	HAL_ADC_Start_DMA(hadc, g_ADCBuffer, ADC_BUFFER_LENGTH);
 }
 /* USER CODE END 1 */
 
