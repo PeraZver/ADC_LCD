@@ -36,11 +36,12 @@ This is an educational project, so the purpose is only fun and learning.
 ## To-Do
 
  - [x] Display single ADC measurement 
- - [ ] Display multichannel ADC measurement values
+ - [x] Display multichannel ADC measurement values
  - [x] Make some cool professional font
- - [ ] Multiple measurements using DMA
+ - [x] Multiple measurements using DMA
  - [ ] Add touchscreen functionality
  - [ ] Calculate some statistics on touchscreen touch
+ - [ ] Plot some values maybe
  - [ ] FreeRTOS
  - [ ] Some kickas graphics, like TouchGFX or uGFX2
 
