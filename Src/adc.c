@@ -43,7 +43,7 @@ void MX_ADC1_Init(void)
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.NbrOfConversion = 3;
   hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -55,6 +55,23 @@ void MX_ADC1_Init(void)
   sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+  */
+  sConfig.Channel = ADC_CHANNEL_VREFINT;
+  sConfig.Rank = 2;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+  */
+  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Rank = 3;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -135,13 +152,9 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 /* USER CODE BEGIN 1 */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 
-	uint32_t g_sum = 0;
-	for (int i = 0; i<ADC_BUFFER_LENGTH; i++)
-		g_sum += g_ADCBuffer[i];
+	g_MeasurementNumber += 1;
 
-	uint32_t adc = g_sum/ADC_BUFFER_LENGTH;
-	g_MeasurementNumber += ADC_BUFFER_LENGTH;
-
+	uint32_t adc = g_ADCBuffer[0];   // Temperature channel is the first one
 	char display_string[30] = {'0'};
 	sprintf(display_string, "ADC Value: %lu", adc);
 	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
@@ -162,6 +175,28 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	sprintf(display_string, "Temperature: %.2f", temperature);
 	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
 	ILI9341_Draw_String(20, 60, WHITE, BLACK, display_string, 2);
+
+
+	adc = g_ADCBuffer[1];   // VREF channel is the 2nd one
+	sprintf(display_string, "ADC Value: %lu", adc);
+	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+	ILI9341_Draw_String(20, 100, WHITE, BLACK, display_string, 2);
+	voltage = (float)adc * 3.3f/4096.0f;
+	sprintf(display_string, "Voltage: %.2f V", voltage);
+	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+	ILI9341_Draw_String(20, 120, WHITE, BLACK, display_string, 2);
+
+
+	adc = g_ADCBuffer[2];   // Analog Input 0 channel is the 3rd one
+	sprintf(display_string, "ADC Value: %lu", adc);
+	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+	ILI9341_Draw_String(20, 160, WHITE, BLACK, display_string, 2);
+	voltage = (float)adc * 3.3f/4096.0f;
+	sprintf(display_string, "Voltage: %.2f V", voltage);
+	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+	ILI9341_Draw_String(20, 180, WHITE, BLACK, display_string, 2);
+
+
 
 	char err_msg[40];
 	sprintf(err_msg, "ADC State: 0x%lX\n", HAL_ADC_GetState(hadc));
