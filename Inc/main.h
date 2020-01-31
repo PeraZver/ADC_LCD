@@ -42,7 +42,7 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
-enum{ ADC_BUFFER_LENGTH = 24 };
+enum{ ADC_BUFFER_LENGTH = 1 };
 extern uint32_t g_ADCBuffer[ADC_BUFFER_LENGTH];
 /* USER CODE END ET */
 

@@ -37,13 +37,13 @@ void MX_ADC1_Init(void)
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV8;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = ENABLE;
+  hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 3;
+  hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DMAContinuousRequests = ENABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -52,26 +52,9 @@ void MX_ADC1_Init(void)
   }
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
   */
-  sConfig.Channel = ADC_CHANNEL_TEMPSENSOR;
+  sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-  */
-  sConfig.Channel = ADC_CHANNEL_VREFINT;
-  sConfig.Rank = 2;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
-  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-  */
-  sConfig.Channel = ADC_CHANNEL_0;
-  sConfig.Rank = 3;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -158,12 +141,12 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	char display_string[30] = {'0'};
 	sprintf(display_string, "ADC Value: %lu", adc);
 	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-	ILI9341_Draw_String(20, 20, WHITE, BLACK, display_string, 2);
 
 	float voltage = (float)adc * 3.3f/4096.0f;
-	sprintf(display_string, "Voltage: %.2f V", voltage);
+	sprintf(display_string, "Voltage: %.3f V", voltage);
 	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-	ILI9341_Draw_String(20, 40, WHITE, BLACK, display_string, 2);
+
+	ILI9341_Draw_String(100, 160, WHITE, BLACK, display_string, 2);
 
 	/* Temp. sensor characteristics from the STM32F4 datasheet:
 	 *  Slope: 2.5mV/°C
@@ -171,30 +154,14 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	 *  What means that: V = 760 mV + 2.5*(T - 25°C) = 697.5 mV + 2.5*T
 	 *  Back calculating: T = (V - 697.5)/2.5
 	 */
+
+	/*
+	 * if Channel == Temperature sensor:
 	float temperature = (voltage*1000 - 697.5) / 2.5;
 	sprintf(display_string, "Temperature: %.2f", temperature);
 	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
 	ILI9341_Draw_String(20, 60, WHITE, BLACK, display_string, 2);
-
-
-	adc = g_ADCBuffer[1];   // VREF channel is the 2nd one
-	sprintf(display_string, "ADC Value: %lu", adc);
-	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-	ILI9341_Draw_String(20, 100, WHITE, BLACK, display_string, 2);
-	voltage = (float)adc * 3.3f/4096.0f;
-	sprintf(display_string, "Voltage: %.2f V", voltage);
-	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-	ILI9341_Draw_String(20, 120, WHITE, BLACK, display_string, 2);
-
-
-	adc = g_ADCBuffer[2];   // Analog Input 0 channel is the 3rd one
-	sprintf(display_string, "ADC Value: %lu", adc);
-	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-	ILI9341_Draw_String(20, 160, WHITE, BLACK, display_string, 2);
-	voltage = (float)adc * 3.3f/4096.0f;
-	sprintf(display_string, "Voltage: %.2f V", voltage);
-	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-	ILI9341_Draw_String(20, 180, WHITE, BLACK, display_string, 2);
+	*/
 
 
 
@@ -211,6 +178,19 @@ void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc){
 	sprintf(err_msg, "ADC State: 0x%lX\n", HAL_ADC_GetState(hadc));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);
 	HAL_ADC_Start_DMA(hadc, g_ADCBuffer, ADC_BUFFER_LENGTH);
+}
+
+void ADC_ChannelConfig(uint32_t channel){
+	ADC_ChannelConfTypeDef sConfig = {0};
+	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+	 */
+	sConfig.Channel = channel;
+	sConfig.Rank = 1;
+	sConfig.SamplingTime = ADC_SAMPLETIME_480CYCLES;
+	if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
 }
 /* USER CODE END 1 */
 

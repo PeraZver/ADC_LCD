@@ -133,3 +133,21 @@ void Display_Color_Picture()
 
 	Display_Square_Icon_40x40(back_icon_40x40, 0, 200);
 }
+
+/********************************************
+ ******** My display functions **************
+ ********     Pero, 1/2020     **************
+ ********************************************/
+
+
+void Display_ADCChannelIcon_60x40(char* text, unsigned int x, unsigned int y){
+	/* Small rectangle first */
+	ILI9341_Draw_Empty_Rectangle(WHITE, x-30, y-20, x+30, y+20);
+	/* Some text inside */
+	ILI9341_Draw_String(x-15, y-5, WHITE, BLACK, text, 2);
+}
+
+
+
+
+
