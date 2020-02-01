@@ -163,8 +163,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 	ILI9341_Draw_String(20, 60, WHITE, BLACK, display_string, 2);
 	*/
 
-
-
 	char err_msg[40];
 	sprintf(err_msg, "ADC State: 0x%lX\n", HAL_ADC_GetState(hadc));
 	HAL_UART_Transmit(&huart2, (uint8_t*) err_msg, strlen(err_msg), 0xFFFF);

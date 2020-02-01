@@ -31,7 +31,7 @@ This is an educational project, so the purpose is only fun and learning.
 ## Software
  * Standard STM32 HAL Libraries, on the fresh STM32CubeIDE
  * ILI9341 Driver - I'm using an existing library from [this guy](https://github.com/martnak/STM32-ILI9341)
-   * Also [this one](https://github.com/afiskon/stm32-ili9341) has nice GUI.
+   * Actually, I switched to [this one](https://github.com/afiskon/stm32-ili9341); it has nice GUI.
 
 ## To-Do
 
@@ -39,10 +39,13 @@ This is an educational project, so the purpose is only fun and learning.
  - [x] Display multichannel ADC measurement values
  - [x] Make some cool professional font
  - [x] Multiple measurements using DMA
- - [ ] Add touchscreen functionality
+ - [x] Add touchscreen functionality
  - [ ] Calculate some statistics on touchscreen touch
  - [ ] Plot some values maybe
  - [ ] FreeRTOS
  - [ ] Some kickas graphics, like TouchGFX or uGFX2
 
- 
+## Resources
+ - [ILI9341 Datasheet](https://cdn-shop.adafruit.com/datasheets/ILI9341.pdf). Unreadable
+ - [Adafruit Library](https://github.com/adafruit/Adafruit_ILI9341)
+ - [PJRC reference](https://www.pjrc.com/store/display_ili9341_touch.html)

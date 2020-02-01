@@ -134,30 +134,31 @@ int main(void)
 
 			if (0 == state) {
 				HAL_ADC_Stop_DMA(&hadc1);
-				if (xtemp > 2700 && xtemp < 3400 && ytemp > 3000 && ytemp < 3500) {
-					ADC_ChannelConfig(ADC_CHANNEL_TEMPSENSOR);
+				if (xtemp > 790 && xtemp < 1300){   // if x is properly chosen
+
+					if (ytemp > 840 && ytemp < 1400 )   // 1st icon pressed
+						ADC_ChannelConfig(ADC_CHANNEL_TEMPSENSOR);
+
+					if (ytemp > 1880 && ytemp < 2560)   // 2nd icon pressed
+						ADC_ChannelConfig(ADC_CHANNEL_VREFINT);
+
+					if (ytemp > 2900 && ytemp < 3600)  // 3rd icon pressed
+						ADC_ChannelConfig(ADC_CHANNEL_0);
+
 					HAL_ADC_Start_DMA(&hadc1, g_ADCBuffer, ADC_BUFFER_LENGTH);
 					state = 1;
 				}
-
-				if (xtemp > 1200 && xtemp < 1900 && ytemp > 3000 && ytemp < 3500) {
-					ADC_ChannelConfig(ADC_CHANNEL_VREFINT);
-					HAL_ADC_Start_DMA(&hadc1, g_ADCBuffer, ADC_BUFFER_LENGTH);
-					state = 1;
-				}
-
 			}
+
 			else {
-				if (xtemp > 3400 && xtemp < 3900 && ytemp > 350 && ytemp < 750) {
-					ILI9341_Draw_String(100, 160, WHITE, BLACK, "No Channel Selected", 2);
-					state = 0;
-				}
+				ILI9341_Draw_String(100, 160, WHITE, BLACK, "No Channel Selected", 2);
+				state = 0;
 			}
 
 			HAL_Delay(500);
 		}
-
 	}
+
   /* USER CODE END 3 */
 }
 
