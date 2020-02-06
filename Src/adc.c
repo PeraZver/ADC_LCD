@@ -156,6 +156,9 @@ void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc){
 	HAL_ADC_Start_DMA(hadc, g_ADCBuffer, ADC_BUFFER_LENGTH);
 }
 
+/* Configure channel based on the input channel number.
+ * Pero, Jan.2020
+ */
 void ADC_ChannelConfig(uint32_t channel){
 	ADC_ChannelConfTypeDef sConfig = {0};
 	/** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
@@ -167,6 +170,25 @@ void ADC_ChannelConfig(uint32_t channel){
 	{
 		Error_Handler();
 	}
+}
+
+/* Configure and start ADC
+ * Pero, Jan.2020
+ */
+void ADC_ConfigAndRun(char icon){
+	HAL_ADC_Stop(&hadc1);
+	switch(icon){
+	case 1:
+		ADC_ChannelConfig(ADC_CHANNEL_TEMPSENSOR);
+		break;
+	case 2:
+		ADC_ChannelConfig(ADC_CHANNEL_VREFINT);
+		break;
+	case 3:
+		ADC_ChannelConfig(ADC_CHANNEL_0);
+		break;
+	}
+	HAL_ADC_Start(&hadc1);
 }
 /* USER CODE END 1 */
 

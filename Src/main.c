@@ -130,37 +130,19 @@ int main(void) {
 			xtemp = TP_Read_XOY(0xD0);
 			ytemp = TP_Read_XOY(0x90);
 
-			if (xtemp > 790 && xtemp < 1300){   // if x is properly chosen
-
-				HAL_ADC_Stop(&hadc1);
-
-				if (ytemp > 840 && ytemp < 1400 && iconPressed != 1) {  // 1st icon pressed
-					ADC_ChannelConfig(ADC_CHANNEL_TEMPSENSOR);
-					HAL_ADC_Start(&hadc1);
-					iconPressed = 1;
-				}
-
-				else if (ytemp > 1880 && ytemp < 2560 && iconPressed != 2){   // 2nd icon pressed
-					ADC_ChannelConfig(ADC_CHANNEL_VREFINT);
-					HAL_ADC_Start(&hadc1);
-					iconPressed = 2;
-				}
-
-				else if (ytemp > 2900 && ytemp < 3600 && iconPressed != 3){  // 3rd icon pressed
-					ADC_ChannelConfig(ADC_CHANNEL_0);
-					HAL_ADC_Start(&hadc1);
-					iconPressed = 3;
-				}
-
-//				else {
-//					ILI9341_Draw_String(100, 160, WHITE, BLACK,	"No Channel Selected", 2);
-//					iconPressed = 0;
-//				}
+			if (xtemp > 790 && xtemp < 1300 && ytemp > 840 && ytemp < 1400 && iconPressed != 1){   // 1st icon pressed
+				iconPressed = 1;
+				ADC_ConfigAndRun(iconPressed);
 			}
-			else {
-				ILI9341_Draw_String(100, 160, WHITE, BLACK,	"No Channel Selected", 2);
-				iconPressed = 0;
+			else if (xtemp > 790 && xtemp < 1300 && ytemp > 1880 && ytemp < 2560 && iconPressed != 2){   // 2nd icon pressed
+				iconPressed = 2;
+				ADC_ConfigAndRun(iconPressed);
 			}
+			else if (xtemp > 790 && xtemp < 1300 && ytemp > 2900 && ytemp < 3600 && iconPressed != 3){  // 3rd icon pressed
+				iconPressed = 3;
+				ADC_ConfigAndRun(iconPressed);
+			}
+
 		}
 
 		//HAL_Delay(500);
