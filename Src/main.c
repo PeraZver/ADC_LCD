@@ -84,6 +84,7 @@ int main(void) {
 	HAL_Init();
 
 	/* USER CODE BEGIN Init */
+	char iconPressed = 0;
 
 	/* USER CODE END Init */
 
@@ -133,33 +134,38 @@ int main(void) {
 
 				HAL_ADC_Stop(&hadc1);
 
-				if (ytemp > 840 && ytemp < 1400) {  // 1st icon pressed
+				if (ytemp > 840 && ytemp < 1400 && iconPressed != 1) {  // 1st icon pressed
 					ADC_ChannelConfig(ADC_CHANNEL_TEMPSENSOR);
 					HAL_ADC_Start(&hadc1);
-					state = 1;
+					iconPressed = 1;
 				}
 
-				if (ytemp > 1880 && ytemp < 2560){   // 2nd icon pressed
+				else if (ytemp > 1880 && ytemp < 2560 && iconPressed != 2){   // 2nd icon pressed
 					ADC_ChannelConfig(ADC_CHANNEL_VREFINT);
 					HAL_ADC_Start(&hadc1);
-					state = 1;
+					iconPressed = 2;
 				}
 
-				if (ytemp > 2900 && ytemp < 3600){  // 3rd icon pressed
+				else if (ytemp > 2900 && ytemp < 3600 && iconPressed != 3){  // 3rd icon pressed
 					ADC_ChannelConfig(ADC_CHANNEL_0);
 					HAL_ADC_Start(&hadc1);
-					state = 1;
+					iconPressed = 3;
 				}
+
+//				else {
+//					ILI9341_Draw_String(100, 160, WHITE, BLACK,	"No Channel Selected", 2);
+//					iconPressed = 0;
+//				}
 			}
 			else {
-				ILI9341_Draw_String(100, 160, WHITE, BLACK,
-						"No Channel Selected", 2);
-				state = 0;
+				ILI9341_Draw_String(100, 160, WHITE, BLACK,	"No Channel Selected", 2);
+				iconPressed = 0;
 			}
-			HAL_Delay(500);
 		}
 
-		if (state == 1){
+		//HAL_Delay(500);
+
+		if (iconPressed){
 			if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK) {
 				uint32_t adc = HAL_ADC_GetValue(&hadc1);
 				float voltage = (float) adc * 3.3f / 4096.0f;
