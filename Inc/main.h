@@ -49,7 +49,6 @@ extern uint32_t g_ADCBuffer[ADC_BUFFER_LENGTH];
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
 extern char err_msg[40];
-extern char display_string[30];
 extern char iconPressed;
 /* USER CODE END EC */
 

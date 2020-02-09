@@ -53,7 +53,6 @@
 char err_msg[40];
 uint8_t state = 0;    // Touchscreen state
 uint32_t g_ADCBuffer[ADC_BUFFER_LENGTH];
-char display_string[30] = { '0' };
 char iconPressed = 0;
 /* USER CODE END PV */
 

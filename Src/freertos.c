@@ -26,6 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
+#include "stdio.h"
 #include "Touch.h"
 #include "adc.h"
 /* USER CODE END Includes */
@@ -61,6 +62,18 @@ void vTouchscreenRead(void *argument);
 void vADC_Readout(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
+
+/* Hook prototypes */
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
+
+/* USER CODE BEGIN 4 */
+__weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+{
+   /* Run time stack overflow checking is performed if
+   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+   called if a stack overflow is detected. */
+}
+/* USER CODE END 4 */
 
 /**
   * @brief  FreeRTOS initialization
@@ -102,7 +115,7 @@ osKernelInitialize();
   const osThreadAttr_t ADC_Readout_attributes = {
     .name = "ADC_Readout",
     .priority = (osPriority_t) osPriorityLow,
-    .stack_size = 256
+    .stack_size = 1024
   };
   ADC_ReadoutHandle = osThreadNew(vADC_Readout, NULL, &ADC_Readout_attributes);
 
@@ -166,6 +179,7 @@ void vTouchscreenRead(void *argument)
 void vADC_Readout(void *argument)
 {
   /* USER CODE BEGIN vADC_Readout */
+	char display_string[30] = { '0' };
   /* Infinite loop */
   for(;;)
   {
@@ -173,8 +187,8 @@ void vADC_Readout(void *argument)
 		if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK) {
 			uint32_t adc = HAL_ADC_GetValue(&hadc1);
 			float voltage = (float) adc * 3.3f / 4096.0f;
-			//ILI9341_Draw_String(100, 160, WHITE, BLACK, "                    " , 2); // clear row
-			sprintf(display_string, "Voltage: %.3f V     ", voltage);
+			snprintf(display_string, 30, "Voltage: %.3f V     ", voltage );
+			//sprintf(display_string, "Voltage: %.3f V     ", voltage);
 			HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
 			ILI9341_Draw_String(100, 160, WHITE, BLACK, display_string, 2);
 			HAL_ADC_Start(&hadc1);
