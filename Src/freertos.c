@@ -186,8 +186,9 @@ void vADC_Readout(void *argument)
 	if (iconPressed){
 		if (HAL_ADC_PollForConversion(&hadc1, 1000) == HAL_OK) {
 			uint32_t adc = HAL_ADC_GetValue(&hadc1);
-			float voltage = (float) adc * 3.3f / 4096.0f;
-			snprintf(display_string, 30, "Voltage: %.3f V     ", voltage );
+			//float voltage = (float) adc * 3.3f / 4096.0f;
+			//snprintf(display_string, 30, "Voltage: %.3f V     ", voltage );
+			snprintf(display_string, 30, "ADC: %lu     ", adc );
 			//sprintf(display_string, "Voltage: %.3f V     ", voltage);
 			HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
 			ILI9341_Draw_String(100, 160, WHITE, BLACK, display_string, 2);
