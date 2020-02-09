@@ -180,15 +180,15 @@ void ADC_ConfigAndRun(char icon){
 	switch(icon){
 	case 1:
 		ADC_ChannelConfig(ADC_CHANNEL_TEMPSENSOR);
-		ILI9341_Draw_String(100, 140, WHITE, BLACK, "Channel TEMPSENSOR:", 2);
+		ILI9341_Draw_String(80, 140, WHITE, BLACK, "Channel TEMPSENSOR", 2);
 		break;
 	case 2:
 		ADC_ChannelConfig(ADC_CHANNEL_VREFINT);
-		ILI9341_Draw_String(100, 140, WHITE, BLACK, "Channel VREF:      ", 2);
+		ILI9341_Draw_String(80, 140, WHITE, BLACK, "Channel VREF      ", 2);
 		break;
 	case 3:
 		ADC_ChannelConfig(ADC_CHANNEL_0);
-		ILI9341_Draw_String(100, 140, WHITE, BLACK, "Channel AIN0:      ", 2);
+		ILI9341_Draw_String(80, 140, WHITE, BLACK, "Channel AIN0      ", 2);
 		break;
 	}
 	HAL_ADC_Start(&hadc1);
