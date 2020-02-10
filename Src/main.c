@@ -50,10 +50,6 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-char err_msg[40];
-uint8_t state = 0;    // Touchscreen state
-uint32_t g_ADCBuffer[ADC_BUFFER_LENGTH];
-char iconPressed = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -113,6 +109,8 @@ int main(void)
 	Display_ADCChannelIcon_60x40("TEMP", 65, 55);
 	Display_ADCChannelIcon_60x40("VREF", 160, 55);
 	Display_ADCChannelIcon_60x40("AIN0", 255, 55);
+	// initialize the touchscreen
+	TP_Init();
 
   /* USER CODE END 2 */
 
