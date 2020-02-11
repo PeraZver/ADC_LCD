@@ -92,7 +92,7 @@ osKernelInitialize();
   const osMessageQueueAttr_t iconQueue_attributes = {
     .name = "iconQueue"
   };
-  iconQueueHandle = osMessageQueueNew (1, sizeof(char), &iconQueue_attributes);
+  iconQueueHandle = osMessageQueueNew (10, sizeof(uint8_t), &iconQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -130,8 +130,12 @@ osKernelInitialize();
 /* USER CODE END Header_vTouchscreenRead */
 void vTouchscreenRead(void *argument)
 {
+    
+    
+    
+
   /* USER CODE BEGIN vTouchscreenRead */
-	char iconPressed = 0;
+	uint8_t iconPressed = 0;
 	uint16_t xtemp, ytemp;
   /* Infinite loop */
   for(;;)
@@ -144,17 +148,17 @@ void vTouchscreenRead(void *argument)
 			if (xtemp > 790 && xtemp < 1300 && ytemp > 840 && ytemp < 1400 && iconPressed != 1){   // 1st icon pressed
 				iconPressed = 1;
 				ADC_ConfigAndRun(iconPressed);
-				osMessageQueuePut(iconQueueHandle, &iconPressed, 1, 0);
+				osMessageQueuePut(iconQueueHandle, &iconPressed, 1, 100);
 			}
 			else if (xtemp > 790 && xtemp < 1300 && ytemp > 1880 && ytemp < 2560 && iconPressed != 2){   // 2nd icon pressed
 				iconPressed = 2;
 				ADC_ConfigAndRun(iconPressed);
-				osMessageQueuePut(iconQueueHandle, &iconPressed, 1, 0);
+				osMessageQueuePut(iconQueueHandle, &iconPressed, 1, 100);
 			}
 			else if (xtemp > 790 && xtemp < 1300 && ytemp > 2900 && ytemp < 3600 && iconPressed != 3){  // 3rd icon pressed
 				iconPressed = 3;
 				ADC_ConfigAndRun(iconPressed);
-				osMessageQueuePut(iconQueueHandle, &iconPressed, 1, 0);
+				osMessageQueuePut(iconQueueHandle, &iconPressed, 1, 100);
 			}
 
 		}
@@ -173,12 +177,12 @@ void vTouchscreenRead(void *argument)
 void vADC_Readout(void *argument)
 {
   /* USER CODE BEGIN vADC_Readout */
-	char iconPressed = 0;
+	uint8_t iconPressed = 0;
 	char display_string[30] = { '0' };
   /* Infinite loop */
   for(;;)
   {
-	  osMessageQueueGet(iconQueueHandle, &iconPressed, (uint8_t) 1, pdMS_TO_TICKS(100));
+	  osMessageQueueGet(iconQueueHandle, &iconPressed, NULL, pdMS_TO_TICKS(100));
 	if (iconPressed){
 		if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
 			uint32_t adc = HAL_ADC_GetValue(&hadc1);
