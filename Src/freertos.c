@@ -92,7 +92,7 @@ osKernelInitialize();
   const osMessageQueueAttr_t iconQueue_attributes = {
     .name = "iconQueue"
   };
-  iconQueueHandle = osMessageQueueNew (10, sizeof(uint8_t), &iconQueue_attributes);
+  iconQueueHandle = osMessageQueueNew (5, sizeof(uint8_t), &iconQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -110,8 +110,8 @@ osKernelInitialize();
   /* definition and creation of ADC_Readout */
   const osThreadAttr_t ADC_Readout_attributes = {
     .name = "ADC_Readout",
-    .priority = (osPriority_t) osPriorityLow,
-    .stack_size = 1024
+    .priority = (osPriority_t) osPriorityNormal,
+    .stack_size = 256
   };
   ADC_ReadoutHandle = osThreadNew(vADC_Readout, NULL, &ADC_Readout_attributes);
 
@@ -147,18 +147,18 @@ void vTouchscreenRead(void *argument)
 
 			if (xtemp > 790 && xtemp < 1300 && ytemp > 840 && ytemp < 1400 && iconPressed != 1){   // 1st icon pressed
 				iconPressed = 1;
-				ADC_ConfigAndRun(iconPressed);
-				osMessageQueuePut(iconQueueHandle, &iconPressed, 1, 100);
+				//ADC_ConfigAndRun(iconPressed);
+				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
 			}
 			else if (xtemp > 790 && xtemp < 1300 && ytemp > 1880 && ytemp < 2560 && iconPressed != 2){   // 2nd icon pressed
 				iconPressed = 2;
-				ADC_ConfigAndRun(iconPressed);
-				osMessageQueuePut(iconQueueHandle, &iconPressed, 1, 100);
+				//ADC_ConfigAndRun(iconPressed);
+				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
 			}
 			else if (xtemp > 790 && xtemp < 1300 && ytemp > 2900 && ytemp < 3600 && iconPressed != 3){  // 3rd icon pressed
 				iconPressed = 3;
-				ADC_ConfigAndRun(iconPressed);
-				osMessageQueuePut(iconQueueHandle, &iconPressed, 1, 100);
+				//ADC_ConfigAndRun(iconPressed);
+				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
 			}
 
 		}
@@ -182,7 +182,7 @@ void vADC_Readout(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  osMessageQueueGet(iconQueueHandle, &iconPressed, NULL, pdMS_TO_TICKS(100));
+	osMessageQueueGet(iconQueueHandle, &iconPressed, NULL, pdMS_TO_TICKS(100));
 	if (iconPressed){
 		if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
 			uint32_t adc = HAL_ADC_GetValue(&hadc1);
@@ -191,7 +191,7 @@ void vADC_Readout(void *argument)
 			int decSpaces = (int)((voltage-intVoltage)*1000);
 			snprintf(display_string, 30, "Voltage: %d.%d V     ", intVoltage, decSpaces );
 			HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-			ILI9341_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
+			//ILI9341_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
 			HAL_ADC_Start(&hadc1);
 		}
 	}
