@@ -64,6 +64,20 @@ void vADC_Readout(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
+/* Hook prototypes */
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName);
+
+/* USER CODE BEGIN 4 */
+__weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
+{
+   /* Run time stack overflow checking is performed if
+   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+   called if a stack overflow is detected. */
+	;
+	HAL_UART_Transmit(&huart2, "Stack overflow detected.", 25 , 100);
+}
+/* USER CODE END 4 */
+
 /**
   * @brief  FreeRTOS initialization
   * @param  None
@@ -140,6 +154,8 @@ void vTouchscreenRead(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	  	osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
+	  	osThreadYield();
 		tp_dev.scan(0);
 		if (tp_dev.sta & TP_PRES_DOWN) {
 			xtemp = TP_Read_XOY(0xD0);
@@ -147,17 +163,17 @@ void vTouchscreenRead(void *argument)
 
 			if (xtemp > 790 && xtemp < 1300 && ytemp > 840 && ytemp < 1400 && iconPressed != 1){   // 1st icon pressed
 				iconPressed = 1;
-				//ADC_ConfigAndRun(iconPressed);
+				ADC_ConfigAndRun(iconPressed);
 				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
 			}
 			else if (xtemp > 790 && xtemp < 1300 && ytemp > 1880 && ytemp < 2560 && iconPressed != 2){   // 2nd icon pressed
 				iconPressed = 2;
-				//ADC_ConfigAndRun(iconPressed);
+				ADC_ConfigAndRun(iconPressed);
 				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
 			}
 			else if (xtemp > 790 && xtemp < 1300 && ytemp > 2900 && ytemp < 3600 && iconPressed != 3){  // 3rd icon pressed
 				iconPressed = 3;
-				//ADC_ConfigAndRun(iconPressed);
+				ADC_ConfigAndRun(iconPressed);
 				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
 			}
 
@@ -179,20 +195,23 @@ void vADC_Readout(void *argument)
   /* USER CODE BEGIN vADC_Readout */
 	uint8_t iconPressed = 0;
 	char display_string[30] = { '0' };
+	osStatus_t status;
   /* Infinite loop */
   for(;;)
   {
-	osMessageQueueGet(iconQueueHandle, &iconPressed, NULL, pdMS_TO_TICKS(100));
-	if (iconPressed){
-		if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
-			uint32_t adc = HAL_ADC_GetValue(&hadc1);
-			float voltage = (float) adc * 3.3f / 4096.0f;
-			int intVoltage = (int)voltage;
-			int decSpaces = (int)((voltage-intVoltage)*1000);
-			snprintf(display_string, 30, "Voltage: %d.%d V     ", intVoltage, decSpaces );
-			HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-			//ILI9341_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
-			HAL_ADC_Start(&hadc1);
+	status = osMessageQueueGet(iconQueueHandle, &iconPressed, NULL, pdMS_TO_TICKS(100));
+	if (status == osOK) {
+		if (iconPressed){
+			if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
+				uint32_t adc = HAL_ADC_GetValue(&hadc1);
+				float voltage = (float) adc * 3.3f / 4096.0f;
+				int intVoltage = (int)voltage;
+				int decSpaces = (int)((voltage-intVoltage)*1000);
+				snprintf(display_string, 30, "Voltage: %d.%d V     ", intVoltage, decSpaces );
+				HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+				//ILI9341_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
+				HAL_ADC_Start(&hadc1);
+			}
 		}
 	}
     osDelay(1);
