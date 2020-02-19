@@ -209,7 +209,7 @@ void vADC_Readout(void *argument)
 				int decSpaces = (int)((voltage-intVoltage)*1000);
 				snprintf(display_string, 30, "Voltage: %d.%d V     ", intVoltage, decSpaces );
 				HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-				//ILI9341_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
+				ILI9341_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
 				HAL_ADC_Start(&hadc1);
 			}
 		}
