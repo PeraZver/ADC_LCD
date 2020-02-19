@@ -178,6 +178,7 @@ void vTouchscreenRead(void *argument)
 			}
 
 		}
+	osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
     osDelay(1);
   }
   /* USER CODE END vTouchscreenRead */
