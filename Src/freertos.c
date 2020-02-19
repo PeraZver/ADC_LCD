@@ -154,9 +154,9 @@ void vTouchscreenRead(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  	osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, pdMS_TO_TICKS(100));
+//	  	osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, pdMS_TO_TICKS(100));
 	  	//osThreadYield();
-/*		tp_dev.scan(0);
+		tp_dev.scan(0);
 		if (tp_dev.sta & TP_PRES_DOWN) {
 			xtemp = TP_Read_XOY(0xD0);
 			ytemp = TP_Read_XOY(0x90);
@@ -177,7 +177,7 @@ void vTouchscreenRead(void *argument)
 				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
 			}
 
-		}*/
+		}
     osDelay(1);
   }
   /* USER CODE END vTouchscreenRead */

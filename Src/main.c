@@ -98,20 +98,17 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-  /* Hack to override HAL priority over that of Systick */
-  //  HAL_NVIC_SetPriority(TIM3_IRQn, 15 ,0);
-  //HAL_SuspendTick();
 	//initial driver setup to drive ili9341
-//	ILI9341_Init();
-//	ILI9341_Set_Rotation(0);
-//	ILI9341_Fill_Screen(BLACK);
-//	HAL_Delay(500);
-//	ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2); /* Draw border for the menu */
-//	ILI9341_Draw_Empty_Rectangle(YELLOW, 10, 10, 310, 230);
-//	// Menu icons
-//	Display_ADCChannelIcon_60x40("TEMP", 65, 55);
-//	Display_ADCChannelIcon_60x40("VREF", 160, 55);
-//	Display_ADCChannelIcon_60x40("AIN0", 255, 55);
+	ILI9341_Init();
+	ILI9341_Set_Rotation(0);
+	ILI9341_Fill_Screen(BLACK);
+	HAL_Delay(500);
+	ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2); /* Draw border for the menu */
+	ILI9341_Draw_Empty_Rectangle(YELLOW, 10, 10, 310, 230);
+	// Menu icons
+	Display_ADCChannelIcon_60x40("TEMP", 65, 55);
+	Display_ADCChannelIcon_60x40("VREF", 160, 55);
+	Display_ADCChannelIcon_60x40("AIN0", 255, 55);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
