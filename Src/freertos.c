@@ -117,7 +117,7 @@ osKernelInitialize();
   const osThreadAttr_t TouchscreenRead_attributes = {
     .name = "TouchscreenRead",
     .priority = (osPriority_t) osPriorityNormal,
-    .stack_size = 128
+    .stack_size = 512
   };
   TouchscreenReadHandle = osThreadNew(vTouchscreenRead, NULL, &TouchscreenRead_attributes);
 
@@ -125,7 +125,7 @@ osKernelInitialize();
   const osThreadAttr_t ADC_Readout_attributes = {
     .name = "ADC_Readout",
     .priority = (osPriority_t) osPriorityNormal,
-    .stack_size = 256
+    .stack_size = 512
   };
   ADC_ReadoutHandle = osThreadNew(vADC_Readout, NULL, &ADC_Readout_attributes);
 
@@ -154,7 +154,7 @@ void vTouchscreenRead(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	  	osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
+	  	osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, pdMS_TO_TICKS(100));
 	  	//osThreadYield();
 /*		tp_dev.scan(0);
 		if (tp_dev.sta & TP_PRES_DOWN) {
@@ -221,7 +221,17 @@ void vADC_Readout(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-     
+// Replace HAL timing functions with FreeRTOS functions
+// Pero, Feb. 2020
+//void HAL_Delay(uint32_t Delay)
+//{
+//    osDelay(Delay);
+//}
+//
+//uint32_t HAL_GetTick(void)
+//{
+//    return osKernelGetTickCount();
+//}
 /* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -99,7 +99,8 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   /* Hack to override HAL priority over that of Systick */
-  HAL_NVIC_SetPriority(TIM3_IRQn, 15 ,0);
+  //  HAL_NVIC_SetPriority(TIM3_IRQn, 15 ,0);
+  //HAL_SuspendTick();
 	//initial driver setup to drive ili9341
 //	ILI9341_Init();
 //	ILI9341_Set_Rotation(0);
