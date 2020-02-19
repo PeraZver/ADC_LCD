@@ -98,20 +98,19 @@ int main(void)
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+  /* Hack to override HAL priority over that of Systick */
+  HAL_NVIC_SetPriority(TIM3_IRQn, 15 ,0);
 	//initial driver setup to drive ili9341
-	ILI9341_Init();
-	ILI9341_Set_Rotation(0);
-	ILI9341_Fill_Screen(BLACK);
-	HAL_Delay(500);
-	ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2); /* Draw border for the menu */
-	ILI9341_Draw_Empty_Rectangle(YELLOW, 10, 10, 310, 230);
-	// Menu icons
-	Display_ADCChannelIcon_60x40("TEMP", 65, 55);
-	Display_ADCChannelIcon_60x40("VREF", 160, 55);
-	Display_ADCChannelIcon_60x40("AIN0", 255, 55);
-	// initialize the touchscreen
-	TP_Init();
-
+//	ILI9341_Init();
+//	ILI9341_Set_Rotation(0);
+//	ILI9341_Fill_Screen(BLACK);
+//	HAL_Delay(500);
+//	ILI9341_Set_Rotation(SCREEN_HORIZONTAL_2); /* Draw border for the menu */
+//	ILI9341_Draw_Empty_Rectangle(YELLOW, 10, 10, 310, 230);
+//	// Menu icons
+//	Display_ADCChannelIcon_60x40("TEMP", 65, 55);
+//	Display_ADCChannelIcon_60x40("VREF", 160, 55);
+//	Display_ADCChannelIcon_60x40("AIN0", 255, 55);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -182,7 +181,7 @@ void SystemClock_Config(void)
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM1 interrupt took place, inside
+  * @note   This function is called  when TIM3 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
@@ -193,7 +192,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM1) {
+  if (htim->Instance == TIM3) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */

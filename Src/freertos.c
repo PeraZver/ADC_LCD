@@ -155,8 +155,8 @@ void vTouchscreenRead(void *argument)
   for(;;)
   {
 	  	osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
-	  	osThreadYield();
-		tp_dev.scan(0);
+	  	//osThreadYield();
+/*		tp_dev.scan(0);
 		if (tp_dev.sta & TP_PRES_DOWN) {
 			xtemp = TP_Read_XOY(0xD0);
 			ytemp = TP_Read_XOY(0x90);
@@ -177,7 +177,7 @@ void vTouchscreenRead(void *argument)
 				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
 			}
 
-		}
+		}*/
     osDelay(1);
   }
   /* USER CODE END vTouchscreenRead */
@@ -199,7 +199,7 @@ void vADC_Readout(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	status = osMessageQueueGet(iconQueueHandle, &iconPressed, NULL, pdMS_TO_TICKS(100));
+	status = osMessageQueueGet(iconQueueHandle, &iconPressed, NULL, 0U);
 	if (status == osOK) {
 		if (iconPressed){
 			if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
