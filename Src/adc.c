@@ -21,6 +21,7 @@
 #include "adc.h"
 
 /* USER CODE BEGIN 0 */
+#define SCOPE_OFFSET 120
 int g_MeasurementNumber = 0;
 /* USER CODE END 0 */
 
@@ -135,33 +136,13 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 /* USER CODE BEGIN 1 */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc){
 
-	g_MeasurementNumber += 1;
+	for (int i = 0; i < ADC_BUFFER_LENGTH; i++){
+		ILI9341_Draw_Pixel(i, SCOPE_OFFSET + (g_ADCBuffer[i] - 4000), WHITE);
+		g_MeasurementNumber += 1;
+	}
 
 	uint32_t adc = g_ADCBuffer[0];   // Temperature channel is the first one
 	char display_string[30] = {'0'};
-	sprintf(display_string, "ADC Value: %lu", adc);
-	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-
-	float voltage = (float)adc * 3.3f/4096.0f;
-	sprintf(display_string, "Voltage: %.3f V", voltage);
-	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-
-	ILI9341_Draw_String(100, 160, WHITE, BLACK, display_string, 2);
-
-	/* Temp. sensor characteristics from the STM32F4 datasheet:
-	 *  Slope: 2.5mV/°C
-	 *  Voltage at 25°C = 0.76
-	 *  What means that: V = 760 mV + 2.5*(T - 25°C) = 697.5 mV + 2.5*T
-	 *  Back calculating: T = (V - 697.5)/2.5
-	 */
-
-	/*
-	 * if Channel == Temperature sensor:
-	float temperature = (voltage*1000 - 697.5) / 2.5;
-	sprintf(display_string, "Temperature: %.2f", temperature);
-	HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-	ILI9341_Draw_String(20, 60, WHITE, BLACK, display_string, 2);
-	*/
 
 	char err_msg[40];
 	sprintf(err_msg, "ADC State: 0x%lX\n", HAL_ADC_GetState(hadc));

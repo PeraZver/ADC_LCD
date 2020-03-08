@@ -42,7 +42,7 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
-enum{ ADC_BUFFER_LENGTH = 1 };
+enum{ ADC_BUFFER_LENGTH = 300 };
 extern uint32_t g_ADCBuffer[ADC_BUFFER_LENGTH];
 /* USER CODE END ET */
 
@@ -67,20 +67,20 @@ void Error_Handler(void);
 #define NO_CONVERSIONS 10
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
+#define T_DO_Pin GPIO_PIN_2
+#define T_DO_GPIO_Port GPIOC
+#define T_DIN_Pin GPIO_PIN_3
+#define T_DIN_GPIO_Port GPIOC
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3
 #define USART_RX_GPIO_Port GPIOA
-#define T_DIN_Pin GPIO_PIN_4
-#define T_DIN_GPIO_Port GPIOC
 #define T_CS_Pin GPIO_PIN_5
 #define T_CS_GPIO_Port GPIOC
-#define T_CLK_Pin GPIO_PIN_0
-#define T_CLK_GPIO_Port GPIOB
 #define T_IRQ_Pin GPIO_PIN_1
 #define T_IRQ_GPIO_Port GPIOB
-#define T_DO_Pin GPIO_PIN_2
-#define T_DO_GPIO_Port GPIOB
+#define T_CLK_Pin GPIO_PIN_10
+#define T_CLK_GPIO_Port GPIOB
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
