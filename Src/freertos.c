@@ -53,6 +53,7 @@
 osThreadId_t TouchscreenReadHandle;
 osThreadId_t ADC_ReadoutHandle;
 osMessageQueueId_t iconQueueHandle;
+osMutexId_t mutexLCDHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -74,7 +75,7 @@ __weak void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTask
    configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
    called if a stack overflow is detected. */
 	;
-	HAL_UART_Transmit(&huart2, "Stack overflow detected.", 25 , 100);
+	HAL_UART_Transmit(&huart2, (uint8_t *)"Stack overflow detected.", 25 , 100);
 }
 /* USER CODE END 4 */
 
@@ -88,6 +89,13 @@ void MX_FREERTOS_Init(void) {
        
   /* USER CODE END Init */
 osKernelInitialize();
+
+  /* Create the mutex(es) */
+  /* definition and creation of mutexLCD */
+  const osMutexAttr_t mutexLCD_attributes = {
+    .name = "mutexLCD"
+  };
+  mutexLCDHandle = osMutexNew(&mutexLCD_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -210,7 +218,13 @@ void vADC_Readout(void *argument)
 				int decSpaces = (int)((voltage-intVoltage)*1000);
 				snprintf(display_string, 30, "Voltage: %d.%d V     ", intVoltage, decSpaces );
 				HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
-				ILI9341_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
+
+				/* Use Mutex to hold writing to LCD */
+				osStatus_t mutexAq = osMutexAcquire(mutexLCDHandle, pdMS_TO_TICKS(100));
+				if (mutexAq == osOK)
+					ILI9341_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
+				mutexAq = osMutexRelease(mutexLCDHandle);
+				/* Reactivate the ADC */
 				HAL_ADC_Start(&hadc1);
 			}
 		}
