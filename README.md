@@ -10,22 +10,22 @@ This is an educational project, so the purpose is only fun and learning.
 
 ### Wiring
 
-|LCD Board|Nucleo |STM32F411RE|  
-| ------- |:-----:| ---------:|
-|VCC      |CN6-4  | -         | 3.3V
-|GND      |CN6-6  | -         | GND
-|CS       |CN5-3  | PB6       | D10, Chip Select
-|RST      |CN9-5  | PB5       | D4,  LCD Reset
-|DC       |CN7-21 | PB7       | Data control
-|MOSI     |CN5-4  | PA7       | D11, MOSI
-|SCK      |CN5-6  | PA5       | D13, SCK
-|LED      |CN7-5  | VDD       | 5V
-|MISO     |CN5-5  | PA6       | D12, MISO
-|T_CLK    |CN8-4  | PB10      | A3, Touch CLK
-|T_CS     |CN10-6 | PC5       | 
-|T_DIN    |CN10-34| PC3       |
-|T_DO     |CN10-22| PC2       |
-|T_IRQ    |CN10-24| PB1       |
+|LCD Board|Nucleo |STM32F411RE|                   |
+| ------- |:-----:| ---------:|	--------------:	  |
+|VCC      |CN6-4  | -         | 3.3V              |
+|GND      |CN6-6  | -         | GND	              |
+|CS       |CN5-3  | PB6       | D10, Chip Select  |
+|RST      |CN9-5  | PB5       | D4,  LCD Reset    |
+|DC       |CN7-21 | PB7       | Data control      |
+|MOSI     |CN5-4  | PA7       | D11, MOSI         |
+|SCK      |CN5-6  | PA5       | D13, SCK          |
+|LED      |CN7-5  | VDD       | 5V                |
+|MISO     |CN5-5  | PA6       | D12, MISO         |
+|T_CLK    |CN8-4  | PB10      | A3, Touch CLK     |
+|T_CS     |CN10-6 | PC5       |               	  |
+|T_DIN    |CN10-34| PC3       |              	  |
+|T_DO     |CN10-22| PC2       |              	  |
+|T_IRQ    |CN10-24| PB1       |              	  |
 
 
 ## Software
@@ -42,7 +42,7 @@ This is an educational project, so the purpose is only fun and learning.
  - [x] Add touchscreen functionality
  - [ ] Calculate some statistics on touchscreen touch
  - [ ] Plot some values maybe
- - [ ] FreeRTOS
+ - [x] FreeRTOS
  - [ ] Some kickas graphics, like TouchGFX or uGFX2
 
 ## Resources

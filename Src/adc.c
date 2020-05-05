@@ -168,6 +168,9 @@ void ADC_ConfigAndRun(char icon){
 	case 3:
 		ADC_ChannelConfig(ADC_CHANNEL_0);
 		break;
+	case 4:
+		//ADC_ChannelConfigDMA(ADC_CHANNEL_0);
+		break;
 	}
 	HAL_ADC_Start(&hadc1);
 }

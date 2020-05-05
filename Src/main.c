@@ -109,6 +109,7 @@ int main(void)
 	Display_ADCChannelIcon_60x40("TEMP", 65, 55);
 	Display_ADCChannelIcon_60x40("VREF", 160, 55);
 	Display_ADCChannelIcon_60x40("AIN0", 255, 55);
+	Display_ADCChannelIcon_60x40("Scope", 65, 120);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */

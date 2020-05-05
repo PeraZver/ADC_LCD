@@ -183,6 +183,12 @@ void vTouchscreenRead(void *argument)
 				mutexLCD_Draw_String(80, 140, WHITE, BLACK, "Channel AIN0      ", 2);
 				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
 			}
+			else if (xtemp > 1400 && xtemp < 1610 && ytemp > 840 && ytemp < 1400 && iconPressed != 4){ // 4th icon pressed
+				iconPressed = 4;
+				ADC_ConfigAndRun(iconPressed);
+				mutexLCD_Draw_String(80, 140, WHITE, BLACK, "Scope selected    ", 2);
+				osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
+			}
 
 		}
 	osMessageQueuePut(iconQueueHandle, &iconPressed, 0U, 0U);
