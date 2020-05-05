@@ -20,10 +20,9 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 #include "adc.h"
-#include "dma.h"
 #include "spi.h"
-#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -31,7 +30,6 @@
 /* USER CODE BEGIN Includes */
 #include "ILI9341_Driver.h"
 #include "display.h"
-#include "Touch.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,13 +50,11 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-char err_msg[40];
-uint8_t state = 0;    // Touchscreen state
-uint32_t g_ADCBuffer[ADC_BUFFER_LENGTH];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 
@@ -98,9 +94,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_SPI1_Init();
-  MX_TIM1_Init();
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
@@ -115,11 +109,15 @@ int main(void)
 	Display_ADCChannelIcon_60x40("TEMP", 65, 55);
 	Display_ADCChannelIcon_60x40("VREF", 160, 55);
 	Display_ADCChannelIcon_60x40("AIN0", 255, 55);
-
-	// initialize the touchscreen
-	TP_Init();
-	uint16_t xtemp, ytemp;
   /* USER CODE END 2 */
+
+  /* Call init function for freertos objects (in freertos.c) */
+  MX_FREERTOS_Init(); 
+
+  /* Start scheduler */
+  osKernelStart();
+  
+  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -127,36 +125,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		tp_dev.scan(0);
-		if (tp_dev.sta & TP_PRES_DOWN) {
-			xtemp = TP_Read_XOY(0xD0);
-			ytemp = TP_Read_XOY(0x90);
-
-			if (0 == state) {
-				HAL_ADC_Stop_DMA(&hadc1);
-				if (xtemp > 790 && xtemp < 1300){   // if x is properly chosen
-
-					if (ytemp > 840 && ytemp < 1400 )   // 1st icon pressed
-						ADC_ChannelConfig(ADC_CHANNEL_TEMPSENSOR);
-
-					if (ytemp > 1880 && ytemp < 2560)   // 2nd icon pressed
-						ADC_ChannelConfig(ADC_CHANNEL_VREFINT);
-
-					if (ytemp > 2900 && ytemp < 3600)  // 3rd icon pressed
-						ADC_ChannelConfig(ADC_CHANNEL_0);
-
-					HAL_ADC_Start_DMA(&hadc1, g_ADCBuffer, ADC_BUFFER_LENGTH);
-					state = 1;
-				}
-			}
-
-			else {
-				ILI9341_Draw_String(100, 160, WHITE, BLACK, "No Channel Selected", 2);
-				state = 0;
-			}
-
-			HAL_Delay(500);
-		}
 	}
 
   /* USER CODE END 3 */
@@ -210,13 +178,34 @@ void SystemClock_Config(void)
 /* USER CODE END 4 */
 
 /**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
+
+/**
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-/* User can add his own implementation to report the HAL error return state */
+	/* User can add his own implementation to report the HAL error return state */
 
   /* USER CODE END Error_Handler_Debug */
 }

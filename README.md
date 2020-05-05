@@ -21,10 +21,10 @@ This is an educational project, so the purpose is only fun and learning.
 |SCK      |CN5-6  | PA5       | D13, SCK
 |LED      |CN7-5  | VDD       | 5V
 |MISO     |CN5-5  | PA6       | D12, MISO
-|T_CLK    |CN8-4  | PB0       | A3, Touch CLK
+|T_CLK    |CN8-4  | PB10      | A3, Touch CLK
 |T_CS     |CN10-6 | PC5       | 
-|T_DIN    |CN10-34| PC4       |
-|T_DO     |CN10-22| PB2       |
+|T_DIN    |CN10-34| PC3       |
+|T_DO     |CN10-22| PC2       |
 |T_IRQ    |CN10-24| PB1       |
 
 
