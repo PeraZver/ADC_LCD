@@ -222,10 +222,9 @@ void vADC_Readout(void *argument)
 	if (status == osOK) {
 		if (iconPressed){
 			if (HAL_ADC_PollForConversion(&hadc1, pdMS_TO_TICKS(100)) == HAL_OK) {
-				uint32_t adc = HAL_ADC_GetValue(&hadc1);
-				float voltage = (float) adc * 3.3f / 4096.0f;
-				int intVoltage = (int)voltage;
-				int decSpaces = (int)((voltage-intVoltage)*1000);
+				float voltage_avg = fADC_Average();
+				int intVoltage = (int)voltage_avg;
+				int decSpaces = (int)((voltage_avg-intVoltage)*1000);
 				snprintf(display_string, 30, "Voltage: %d.%d V     ", intVoltage, decSpaces );
 				HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
 				/* Mutex-ed function to write to the LCD */

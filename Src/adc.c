@@ -194,6 +194,17 @@ void ADC_ConfigAndRun(char icon){
 	}
 	HAL_ADC_Start_DMA(&hadc1, g_ADCBuffer, ADC_BUFFER_LENGTH);
 }
+
+float fADC_Average(){
+	float cumsum = 0;
+	float cumsum2 = 0;
+	for (uint32_t i = 0; i < ADC_BUFFER_LENGTH; i ++){
+		float adc_voltage = (float) g_ADCBuffer[i] * 3.3f / 4096.0;
+		cumsum += adc_voltage;
+		cumsum2 += (adc_voltage*adc_voltage);
+	}
+	return (cumsum/ADC_BUFFER_LENGTH);
+}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

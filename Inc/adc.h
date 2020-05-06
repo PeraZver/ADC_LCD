@@ -41,6 +41,7 @@ void MX_ADC1_Init(void);
 /* USER CODE BEGIN Prototypes */
 void ADC_ChannelConfig(uint32_t channel);
 void ADC_ConfigAndRun(char icon);
+float fADC_Average(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
