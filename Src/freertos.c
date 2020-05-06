@@ -154,6 +154,10 @@ osKernelInitialize();
 /* USER CODE END Header_vTouchscreenRead */
 void vTouchscreenRead(void *argument)
 {
+    
+    
+    
+
   /* USER CODE BEGIN vTouchscreenRead */
 	uint8_t iconPressed = 0;
 	uint16_t xtemp, ytemp;
@@ -217,7 +221,7 @@ void vADC_Readout(void *argument)
 	status = osMessageQueueGet(iconQueueHandle, &iconPressed, NULL, 0U);
 	if (status == osOK) {
 		if (iconPressed){
-			if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
+			if (HAL_ADC_PollForConversion(&hadc1, pdMS_TO_TICKS(100)) == HAL_OK) {
 				uint32_t adc = HAL_ADC_GetValue(&hadc1);
 				float voltage = (float) adc * 3.3f / 4096.0f;
 				int intVoltage = (int)voltage;
@@ -227,7 +231,7 @@ void vADC_Readout(void *argument)
 				/* Mutex-ed function to write to the LCD */
 				mutexLCD_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
 				/* Reactivate the ADC */
-				HAL_ADC_Start(&hadc1);
+				HAL_ADC_Start_DMA(&hadc1, g_ADCBuffer, ADC_BUFFER_LENGTH);
 			}
 		}
 	}
