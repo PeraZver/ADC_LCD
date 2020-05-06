@@ -215,6 +215,8 @@ void vADC_Readout(void *argument)
 	uint8_t iconPressed = 0;
 	char display_string[30] = { '0' };
 	osStatus_t status;
+
+	structADCStat ADCStat;
   /* Infinite loop */
   for(;;)
   {
@@ -222,13 +224,26 @@ void vADC_Readout(void *argument)
 	if (status == osOK) {
 		if (iconPressed){
 			if (HAL_ADC_PollForConversion(&hadc1, pdMS_TO_TICKS(100)) == HAL_OK) {
-				float voltage_avg = fADC_Average();
-				int intVoltage = (int)voltage_avg;
-				int decSpaces = (int)((voltage_avg-intVoltage)*1000);
-				snprintf(display_string, 30, "Voltage: %d.%d V     ", intVoltage, decSpaces );
+				/* Calculate some statistics */
+				ADC_Statistics(&ADCStat);
+
+				/* Turn floats in LCD printable form */
+				/* First the avg value */
+				int intVoltage = (int)ADCStat.avg;
+				int decSpaces = (int)((ADCStat.avg-intVoltage)*1000);
+				snprintf(display_string, 30, "AVG: %d.%d V     ", intVoltage, decSpaces );
 				HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
 				/* Mutex-ed function to write to the LCD */
 				mutexLCD_Draw_String(80, 160, WHITE, BLACK, display_string, 2);
+
+				/* Now the StdDev value */
+				intVoltage = (int)(ADCStat.stdev*1e3);
+				decSpaces = (int)((ADCStat.stdev*1e3 - intVoltage)*1000);
+				snprintf(display_string, 30, "STDEV: %d.%d mV     ", intVoltage, decSpaces );
+				HAL_UART_Transmit(&huart2, (uint8_t*) display_string, strlen(display_string), 0xFFFF);
+				/* Mutex-ed function to write to the LCD */
+				mutexLCD_Draw_String(80, 180, WHITE, BLACK, display_string, 2);
+
 				/* Reactivate the ADC */
 				HAL_ADC_Start_DMA(&hadc1, g_ADCBuffer, ADC_BUFFER_LENGTH);
 			}

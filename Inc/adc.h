@@ -27,13 +27,16 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "math.h"
 /* USER CODE END Includes */
 
 extern ADC_HandleTypeDef hadc1;
 
 /* USER CODE BEGIN Private defines */
-
+typedef struct {
+	float avg;
+	float stdev;
+} structADCStat;
 /* USER CODE END Private defines */
 
 void MX_ADC1_Init(void);
@@ -42,6 +45,8 @@ void MX_ADC1_Init(void);
 void ADC_ChannelConfig(uint32_t channel);
 void ADC_ConfigAndRun(char icon);
 float fADC_Average(void);
+float fADC_StdDev(float avg);
+void ADC_Statistics(structADCStat* adcStat);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

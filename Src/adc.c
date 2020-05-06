@@ -194,16 +194,29 @@ void ADC_ConfigAndRun(char icon){
 	}
 	HAL_ADC_Start_DMA(&hadc1, g_ADCBuffer, ADC_BUFFER_LENGTH);
 }
-
+/* A function that calculates average of the ADC buffer data */
 float fADC_Average(){
 	float cumsum = 0;
-	float cumsum2 = 0;
 	for (uint32_t i = 0; i < ADC_BUFFER_LENGTH; i ++){
 		float adc_voltage = (float) g_ADCBuffer[i] * 3.3f / 4096.0;
 		cumsum += adc_voltage;
-		cumsum2 += (adc_voltage*adc_voltage);
 	}
 	return (cumsum/ADC_BUFFER_LENGTH);
+}
+/* A function that calculates standard deviation of the ADC buffer data */
+float fADC_StdDev(float avg){
+	float cumsum_sq = 0;
+	for (uint32_t i = 0; i < ADC_BUFFER_LENGTH; i ++){
+		float adc_voltage = (float) g_ADCBuffer[i] * 3.3f / 4096.0;
+		cumsum_sq += pow(adc_voltage - avg, 2);
+	}
+	return sqrt(cumsum_sq/(ADC_BUFFER_LENGTH-1)); // N-1 is so called Bessel's correction, when calculating std dev.
+}
+
+/* A function that returns some statistics in a structure form */
+void ADC_Statistics(structADCStat* adcStat){
+	adcStat->avg = fADC_Average();
+	adcStat->stdev = fADC_StdDev(adcStat->avg);
 }
 /* USER CODE END 1 */
 

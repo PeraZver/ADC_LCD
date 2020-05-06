@@ -40,6 +40,7 @@ This is an educational project, so the purpose is only fun and learning.
  - [x] Make some cool professional font
  - [x] Multiple measurements using DMA
  - [x] Add touchscreen functionality
+ - [ ] Config menu options
  - [ ] Calculate some statistics on touchscreen touch
  - [ ] Plot some values maybe
  - [x] FreeRTOS
