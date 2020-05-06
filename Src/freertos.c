@@ -133,7 +133,7 @@ osKernelInitialize();
   const osThreadAttr_t ADC_Readout_attributes = {
     .name = "ADC_Readout",
     .priority = (osPriority_t) osPriorityNormal,
-    .stack_size = 512
+    .stack_size = 2048
   };
   ADC_ReadoutHandle = osThreadNew(vADC_Readout, NULL, &ADC_Readout_attributes);
 
